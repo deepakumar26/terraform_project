@@ -1,2 +1,2 @@
 # terraform_project
-Code changes for the project using terform
+Code changes for the project using terraform
