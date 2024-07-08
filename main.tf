@@ -68,5 +68,10 @@ resource "aws_key_pair" "generated_key" {
   public_key = tls_private_key.generated_key.public_key_openssh
 }
 
+# Save the private key to a local file
+resource "local_file" "example" {
+  content  = tls_private_key.private_key.private_key_pem
+  filename = "${path.module}/my-key-pair.pem"
+}
 
 
