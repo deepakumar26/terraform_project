@@ -32,6 +32,23 @@ provider "aws" {
   region = var.aws_region
 }
 
+# Create a key pair
+resource "tls_private_key" "private_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "aws_key_pair_public" {
+  key_name   = "my-key-pair"
+  public_key = tls_private_key.private_key.public_key_openssh
+}
+
+# Save the private key to a local file
+resource "local_file" "example" {
+  content  = tls_private_key.private_key.private_key_pem
+  filename = "${path.module}/my-key-pair.pem"
+}
+
 #module for vpc and providing the source location
 module "vpc" {
   source = "./modules/vpc"
@@ -49,29 +66,7 @@ module "asg" {
   source            = "./modules/asg"
   public_subnet_ids = module.vpc.public_subnet_ids
   target_group_arn  = module.alb.target_group_arn
-  key_name          = aws_key_pair.generated_key.key_name
-  public_key        = tls_private_key.generated_key.public_key_openssh
+  key_name          = aws_key_pair.aws_key_pair_public.key_name
+  public_key        = tls_private_key.private_key.public_key_openssh
   security_group_id = module.alb.alb_security_group_id
 }
-
-# creating the private key
-
-resource "tls_private_key" "generated_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-# creating the public key
-
-resource "aws_key_pair" "generated_key" {
-  key_name   = "my-key-pair"
-  public_key = tls_private_key.generated_key.public_key_openssh
-}
-
-# Save the private key to a local file
-resource "local_file" "example" {
-  content  = tls_private_key.private_key.private_key_pem
-  filename = "${path.module}/my-key-pair.pem"
-}
-
-
