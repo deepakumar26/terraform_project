@@ -32,3 +32,8 @@ variable "ami_instance_type" {
   type = string
   default = "t2.micro"
 }
+
+variable "private_subnet_ids" {
+  description = "List of private subnet IDs"
+  type        = list(string)
+}

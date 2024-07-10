@@ -69,4 +69,5 @@ module "asg" {
   key_name          = aws_key_pair.aws_key_pair_public.key_name
   public_key        = tls_private_key.private_key.public_key_openssh
   security_group_id = module.alb.alb_security_group_id
+  private_subnet_ids = module.vpc.private_subnet_ids
 }
